@@ -3,16 +3,17 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const cartRoutes = require('./routes/cartRoutes'); // Import routes
+require('dotenv').config()
 
 const app = express();
-const port = 5000;
+const port = process.env.PORT;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 // Connect to MongoDB
-mongoose.connect('mongodb+srv://jayantshelke4829:X28OghFzxnZfiX3o@foody.50gxu.mongodb.net/?retryWrites=true&w=majority&appName=Foody', {
+mongoose.connect(process.env.MONGO_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
