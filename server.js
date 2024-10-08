@@ -21,8 +21,7 @@ mongoose.connect(process.env.MONGO_URL, {
   .catch(err => console.log(err));
 
 // Use cart routes
-app.use(cartRoutes);
-
+app.use('/api', cartRoutes);
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
