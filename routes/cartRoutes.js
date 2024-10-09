@@ -17,7 +17,7 @@ router.get('/cart', async (req, res) => {
 router.post('/cart', async (req, res) => {
   const { idMeal, strMeal, price, quantity, strMealThumb } = req.body;
 
-  console.log("Request Body:", req.body); // Log the request body for debugging
+  console.log("Received Request Body:", req.body); // Log the request body for debugging
 
   try {
     // Ensure all required fields are provided
@@ -37,7 +37,7 @@ router.post('/cart', async (req, res) => {
     const updatedCart = await Cart.find();
     res.json(updatedCart);
   } catch (error) {
-    console.error("Error adding item to cart:", error.message); // Log the error message
+    console.error("Error adding item to cart:", error); // Log the full error object
     res.status(500).json({ error: 'Failed to add item to cart', details: error.message });
   }
 });
