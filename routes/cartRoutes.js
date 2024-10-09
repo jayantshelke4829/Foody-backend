@@ -3,9 +3,21 @@ const express = require('express');
 const Cart = require('../models/Cart.js');
 const router = express.Router();
 
+// Get cart items
+router.get('/cart', async (req, res) => {
+  try {
+    const cart = await Cart.find();
+    res.json(cart);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch cart items' });
+  }
+});
+
 // Add item to cart
 router.post('/cart', async (req, res) => {
   const { idMeal, strMeal, price, quantity, strMealThumb } = req.body;
+
+  console.log("Request Body:", req.body); // Log the request body for debugging
 
   try {
     // Ensure all required fields are provided
@@ -30,23 +42,44 @@ router.post('/cart', async (req, res) => {
   }
 });
 
-// Save the cart (optional)
-router.post('/save-cart', async (req, res) => {
-  const { cart } = req.body;
+// Remove item from cart
+router.delete('/cart/:idMeal', async (req, res) => {
+  const { idMeal } = req.params;
 
   try {
-    // Ensure the cart data is valid
-    if (!cart || !Array.isArray(cart)) {
-      return res.status(400).json({ error: 'Invalid cart data' });
-    }
-
-    // Clear existing cart items (optional)
-    await Cart.deleteMany(); // Clear existing items if required
-    await Cart.insertMany(cart); // Save the new cart
-
-    res.json({ message: 'Cart saved successfully' });
+    await Cart.deleteOne({ idMeal });
+    const updatedCart = await Cart.find();
+    res.json(updatedCart);
   } catch (error) {
-    console.error("Error saving cart:", error.message); // Log the error message
-    res.status(500).json({ error: 'Failed to save cart', details: error.message });
+    res.status(500).json({ error: 'Failed to remove item from cart' });
   }
 });
+
+// Update cart item quantity
+router.patch('/cart/:idMeal', async (req, res) => {
+  const { idMeal } = req.params;
+  const { quantity } = req.body;
+
+  try {
+    const cartItem = await Cart.findOne({ idMeal });
+
+    if (cartItem) {
+      if (cartItem.quantity > 1 && quantity < 0) {
+        // Decrease quantity
+        cartItem.quantity += quantity;
+        await cartItem.save();
+      } else {
+        // Remove item if quantity is 0 or less
+        await Cart.deleteOne({ idMeal });
+      }
+      const updatedCart = await Cart.find();
+      return res.status(200).json(updatedCart);
+    } else {
+      return res.status(404).json({ message: 'Item not found in cart' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update the cart' });
+  }
+});
+
+module.exports = router;
