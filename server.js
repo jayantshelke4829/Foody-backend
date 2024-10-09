@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -6,10 +5,14 @@ const cartRoutes = require('./routes/cartRoutes');
 require('dotenv').config()
 
 const app = express();
-const port = process.env.PORT || 5000; // Fallback to 5000 if PORT is undefined
+const port = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+// Allow CORS from specific origin or all origins
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://foody-backend-kjpp.onrender.com'],  // Add the origin of your frontend app
+  credentials: true // If your app requires credentials like cookies, tokens
+}));
 app.use(express.json());
 
 // Connect to MongoDB
@@ -21,18 +24,7 @@ mongoose.connect(process.env.MONGO_URL, {
   .catch(err => console.log(err));
 
 // Use cart routes
-app.use('/api', cartRoutes);  // Prefix routes with /api
-
-app.post('/api/save-cart', (req, res) => { // Add save-cart route here
-  const { cart } = req.body;
-
-  try {
-    // Save cart logic (e.g., store cart to MongoDB)
-    res.status(200).json({ message: 'Cart saved successfully' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to save cart' });
-  }
-});
+app.use('/api', cartRoutes);
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
