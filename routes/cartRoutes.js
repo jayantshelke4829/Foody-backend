@@ -1,4 +1,3 @@
-// routes/cartRoutes.js
 const express = require('express');
 const Cart = require('../models/Cart.js');
 const router = express.Router();
@@ -9,6 +8,7 @@ router.get('/cart', async (req, res) => {
     const cart = await Cart.find();
     res.json(cart);
   } catch (error) {
+    console.error('Error fetching cart items:', error);
     res.status(500).json({ error: 'Failed to fetch cart items' });
   }
 });
@@ -20,7 +20,6 @@ router.post('/cart', async (req, res) => {
   console.log("Received Request Body:", req.body); // Log the request body for debugging
 
   try {
-    // Ensure all required fields are provided
     if (!idMeal || !strMeal || !price || !quantity || !strMealThumb) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
@@ -51,6 +50,7 @@ router.delete('/cart/:idMeal', async (req, res) => {
     const updatedCart = await Cart.find();
     res.json(updatedCart);
   } catch (error) {
+    console.error('Error removing item from cart:', error);
     res.status(500).json({ error: 'Failed to remove item from cart' });
   }
 });
@@ -65,11 +65,9 @@ router.patch('/cart/:idMeal', async (req, res) => {
 
     if (cartItem) {
       if (cartItem.quantity > 1 && quantity < 0) {
-        // Decrease quantity
         cartItem.quantity += quantity;
         await cartItem.save();
       } else {
-        // Remove item if quantity is 0 or less
         await Cart.deleteOne({ idMeal });
       }
       const updatedCart = await Cart.find();
@@ -78,6 +76,7 @@ router.patch('/cart/:idMeal', async (req, res) => {
       return res.status(404).json({ message: 'Item not found in cart' });
     }
   } catch (error) {
+    console.error('Error updating cart:', error);
     res.status(500).json({ error: 'Failed to update the cart' });
   }
 });
