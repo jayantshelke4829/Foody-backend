@@ -10,9 +10,10 @@ const port = process.env.PORT;
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:5173', // Allow requests from your frontend
+  origin: 'https://your-live-frontend-url.com', // Replace with your live frontend URL
   credentials: true,
 }));
+
 app.use(express.json());
 
 // Connect to MongoDB
