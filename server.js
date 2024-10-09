@@ -10,7 +10,7 @@ const port = process.env.PORT;
 
 // Middleware
 app.use(cors({
-  origin: 'https://foody-gules.vercel.app', // Replace with your live frontend URL
+  origin: 'https://foody-gules.vercel.app/cart', // Replace with your live frontend URL
   credentials: true,
 }));
 
