@@ -14,25 +14,29 @@ router.get('/cart', async (req, res) => {
 });
 
 // Add item to cart
+// Add item to cart
 router.post('/cart', async (req, res) => {
-  const { idMeal, name, price, strMeal, quantity, strMealThumb } = req.body;
+  const { idMeal, strMeal, price, quantity, strMealThumb } = req.body; // Ensure these fields match your frontend
 
   try {
     let cartItem = await Cart.findOne({ idMeal });
 
     if (cartItem) {
-      cartItem.quantity += quantity;
+      cartItem.quantity += quantity; // Update quantity if item already exists
     } else {
-      cartItem = new Cart({ idMeal, name, price, strMeal, quantity, strMealThumb });
+      // Create a new cart item
+      cartItem = new Cart({ idMeal, strMeal, price, quantity, strMealThumb });
     }
 
     await cartItem.save();
-    const updatedCart = await Cart.find();
-    res.json(updatedCart);
+    const updatedCart = await Cart.find(); // Fetch updated cart after saving
+    res.json(updatedCart); // Respond with updated cart
   } catch (error) {
+    console.error("Error adding item to cart:", error); // Log error for debugging
     res.status(500).json({ error: 'Failed to add item to cart' });
   }
 });
+
 
 // Remove item from cart
 router.delete('/cart/:idMeal', async (req, res) => {
@@ -75,13 +79,19 @@ router.patch('/cart/:idMeal', async (req, res) => {
 });
 
 // Save the cart (optional)
+// Save the cart (optional)
 router.post('/save-cart', async (req, res) => {
   const { cart } = req.body;
 
   try {
-    // Optionally process the cart data (e.g., save to another collection)
+    // Optional: Save cart to a collection or process it as needed
+    // For example, if you want to save it:
+    await Cart.deleteMany(); // Clear existing cart (optional)
+    await Cart.insertMany(cart); // Save the new cart
+
     res.json({ message: 'Cart saved successfully' });
   } catch (error) {
+    console.error("Error saving cart:", error); // Log error for debugging
     res.status(500).json({ error: 'Failed to save cart' });
   }
 });
